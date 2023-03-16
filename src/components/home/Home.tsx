@@ -1,14 +1,30 @@
 import React, {ChangeEvent, useState} from 'react';
 import {Button, TextField} from "material-ui-core";
-import Box from '@mui/material/Box';
+import {optionType} from "../../types";
 
 const Home = (): JSX.Element => {
-    const [term, setTerm] = useState("");
-    const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-       console.log(e.target.value)
+    const [term, setTerm] = useState<string>("");
+    const [options, setOptions] = useState<[]>([]);
+    const getSearchOption = (value: string) => {
+        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${process.env.REACT_API_KEY}`)
+            .then((res) => res.json())
+            .then((data) => setOptions(data))
+
     }
-    /*
-    * http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}*/
+
+
+    const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.trim();
+        setTerm(value);
+        getSearchOption(value);
+        if (value === "") return
+
+    }
+    const onOptionSelect = (option: optionType) => {
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${option.lat}&lon=${option.lon}&units=metric&appid=${process.env.REACT_API_KEY}
+`).then((res) => res.json())
+            .then((data)=>console.log({data}))
+    }
     return (
         <>
             <section className={"flex justify-center items-center  mt-28 opacity-50 "}>
@@ -20,8 +36,7 @@ const Home = (): JSX.Element => {
                         select an option from dropdown</h5>
                     <div className="relative flex mt-10 h-[50px] md:mt-4 w-full ">
 
-                        <Box className={"m-auto "}
-                             component="form"
+                        <div className={"m-auto "}
 
                         >
                             <TextField
@@ -33,8 +48,17 @@ const Home = (): JSX.Element => {
                                 variant="filled"
                                 onChange={onInputChange}
                             />
+                            <ul className={"  absolute top-14  rounded-l-md  w-full "}>
+                                {options.map((option: optionType, index: number) =>
+                                    <li className={"flex flex justify-between border-y-2 "}
+                                        key={`${option}_${index}`}>{option.name}
+                                        <button className={" text-sm w-[50%] hover:bg-zinc-700"}
+                                                onClick={() => onOptionSelect(option)}>
+                                            {option.name}
+                                        </button>
+                                    </li>)}
 
-
+                            </ul>
                             <Button
                                 className=" flex  mx-auto cursor-pointer w-36 "
                                 size={"large"}
@@ -43,7 +67,7 @@ const Home = (): JSX.Element => {
                                 search
                             </Button>
 
-                        </Box>
+                        </div>
 
                     </div>
                 </div>
