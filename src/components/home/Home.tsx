@@ -1,18 +1,24 @@
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import {Button, TextField} from "material-ui-core";
 import {optionType} from "../../types";
 
 const Home = (): JSX.Element => {
     const [term, setTerm] = useState<string>("");
     const [options, setOptions] = useState<[]>([]);
-    const getSearchOption = (value: string) => {
-        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${process.env.REACT_API_KEY}`)
+    const [city, setCity] = useState<optionType | null>(null);
+//?getSearchOption
+    const getSearchOption =   (value: string) => {
+        if (!value) {
+            setOptions([]);
+            return;
+        }
+        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=e0ae8e1697d4a43091c5705897ab0298`)
             .then((res) => res.json())
             .then((data) => setOptions(data))
 
     }
 
-
+//?OnInputChange
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.trim();
         setTerm(value);
@@ -20,11 +26,32 @@ const Home = (): JSX.Element => {
         if (value === "") return
 
     }
+    //?OnOptionSelect
     const onOptionSelect = (option: optionType) => {
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${option.lat}&lon=${option.lon}&units=metric&appid=${process.env.REACT_API_KEY}
-`).then((res) => res.json())
-            .then((data)=>console.log({data}))
+        setCity(option)
+
     }
+    //?getForecast
+    const getForecast = (city: optionType) => {
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=e0ae8e1697d4a43091c5705897ab0298
+`).then((res) => res.json())
+            .then((data) => console.log({data}))
+    }
+
+    //?Submit
+    const onSubmit = (e:any) => {
+        e.preventDefault()
+        if (!city) return
+        getForecast(city)
+
+    }
+    useEffect(() => {
+        if (city) {
+            setTerm(city.name)
+            setOptions([])
+        }
+
+    }, [city])
     return (
         <>
             <section className={"flex justify-center items-center  mt-28 opacity-50 "}>
@@ -49,7 +76,7 @@ const Home = (): JSX.Element => {
                                 onChange={onInputChange}
                             />
                             <ul className={"  absolute top-14  rounded-l-md  w-full "}>
-                                {options.map((option: optionType, index: number) =>
+                                {options?.map((option: optionType, index: number) =>
                                     <li className={"flex flex justify-between border-y-2 "}
                                         key={`${option}_${index}`}>{option.name}
                                         <button className={" text-sm w-[50%] hover:bg-zinc-700"}
@@ -63,7 +90,7 @@ const Home = (): JSX.Element => {
                                 className=" flex  mx-auto cursor-pointer w-36 "
                                 size={"large"}
                                 color={"primary"}
-                            >
+                             onClick={onSubmit}>
                                 search
                             </Button>
 
