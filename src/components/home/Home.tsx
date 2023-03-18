@@ -12,7 +12,7 @@ const Home = (): JSX.Element => {
             setOptions([]);
             return;
         }
-        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=e0ae8e1697d4a43091c5705897ab0298`)
+        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${process.env.REACT_API_KEY}`)
             .then((res) => res.json())
             .then((data) => setOptions(data))
 
@@ -33,7 +33,7 @@ const Home = (): JSX.Element => {
     }
     //?getForecast
     const getForecast = (city: optionType) => {
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=e0ae8e1697d4a43091c5705897ab0298
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=${process.env.REACT_API_KEY}
 `).then((res) => res.json())
             .then((data) => console.log({data}))
     }
