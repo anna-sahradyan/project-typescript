@@ -7,7 +7,6 @@ const App = (): JSX.Element => {
             <>
                 <Layout className={"flex w-full h-screen "}>
                     <Home/>
-
                 </Layout>
 
             </>
