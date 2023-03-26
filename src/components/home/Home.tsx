@@ -9,6 +9,7 @@ const Home = (): JSX.Element => {
     return (
         <>
             {forecast ? (
+
                 <Forecast data={forecast}/>
             ) : (<Search options={options} term={term} onInputChange={onInputChange} onSubmit={onSubmit}
                          onOptionSelect={onOptionSelect}/>)}
